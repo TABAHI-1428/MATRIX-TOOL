@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Remote Access Toolkit</title>
+
+<style>
+
+body{
+background:black;
+color:#00ff00;
+font-family:monospace;
+margin:0;
+text-align:center;
+overflow:hidden;
+}
+
+/* ANIMATIONS */
+
+@keyframes zoomIn{
+from{transform:scale(0.6);opacity:0;}
+to{transform:scale(1);opacity:1;}
+}
+
+@keyframes fadeOut{
+from{opacity:1;}
+to{opacity:0;}
+}
+
+@keyframes glow{
+0%{text-shadow:0 0 5px #00ff00;}
+50%{text-shadow:0 0 25px #00ff00;}
+100%{text-shadow:0 0 5px #00ff00;}
+}
+
+/* LOGIN */
+
+#loginScreen{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+background:black;
+animation:zoomIn 0.8s ease;
+}
+
+#loginScreen input{
+padding:10px;
+margin:10px;
+}
+
+#loginScreen button{
+padding:10px 25px;
+background:#00ff00;
+border:none;
+cursor:pointer;
+}
+
+/* WELCOME */
+
+#welcomeScreen{
+display:none;
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100vh;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+background:black;
+}
+
+#welcomeScreen h1{
+animation:glow 1.5s infinite;
+}
+
+/* MATRIX */
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+/* DASHBOARD */
+
+#dashboard{
+padding:60px;
+display:none;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:25px;
+}
+
+.tool{
+border:1px solid #00ff00;
+padding:30px;
+cursor:pointer;
+background:rgba(0,0,0,0.6);
+transition:0.3s;
+}
+
+.tool:hover{
+background:#001100;
+transform:scale(1.07);
+box-shadow:0 0 15px #00ff00;
+}
+
+.icon{
+font-size:40px;
+margin-bottom:10px;
+}
+
+#panel{
+display:none;
+padding:40px;
+}
+
+#terminal{
+white-space:pre-line;
+text-align:left;
+width:80%;
+margin:auto;
+margin-top:30px;
+}
+
+input{
+padding:10px;
+margin:5px;
+}
+
+button{
+padding:10px 20px;
+background:#00ff00;
+border:none;
+cursor:pointer;
+}
+
+#error{
+color:red;
+font-weight:bold;
+}
+
+video{
+border:2px solid #00ff00;
+margin-top:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div id="loginScreen">
+
+<h1>SECURE ACCESS</h1>
+
+<input id="user" placeholder="Username">
+<input id="pass" type="password" placeholder="Password">
+
+<button onclick="login()">LOGIN</button>
+
+<p id="loginError"></p>
+
+</div>
+
+<!-- WELCOME -->
+
+<div id="welcomeScreen">
+
+<h1>WELCOME AYUSH AKA TABAHI</h1>
+<p>Initializing system...</p>
+
+</div>
+
+<canvas id="matrix"></canvas>
+
+<h1 id="titleMain" style="display:none;">ULTIMATE REMOTE ACCESS TOOLKIT MADE BY TABAHI</h1>
+
+<div id="dashboard">
+
+<div class="tool" onclick="locationTool()">
+<div class="icon">📍</div>
+Location Tracking
+</div>
+
+<div class="tool" onclick="cctvTool()">
+<div class="icon">📷</div>
+CCTV Cracker
+</div>
+
+<div class="tool" onclick="grabTool()">
+<div class="icon">📡</div>
+Grabber
+</div>
+
+<div class="tool" onclick="phoneTool()">
+<div class="icon">📱</div>
+Phone Access
+</div>
+
+<div class="tool" onclick="dataTool()">
+<div class="icon">💾</div>
+Data Transfer
+</div>
+
+<div class="tool" onclick="matrixDestroyTool()">
+<div class="icon">💀</div>
+Matrix Destruction
+</div>
+
+</div>
+
+<div id="panel">
+
+<h2 id="title"></h2>
+
+<div id="inputArea"></div>
+
+<p id="error"></p>
+
+<div id="terminal"></div>
+
+<br>
+
+<button onclick="back()">BACK</button>
+
+</div>
+
+<script>
+
+let stopProcess=false;
+
+
+/* LOGIN */
+
+function login(){
+
+let u=document.getElementById("user").value;
+let p=document.getElementById("pass").value;
+
+if(u==="TABAHI" && p==="TABAHI1428"){
+
+document.getElementById("loginScreen").style.animation="fadeOut 0.6s";
+
+setTimeout(function(){
+
+document.getElementById("loginScreen").style.display="none";
+document.getElementById("welcomeScreen").style.display="flex";
+
+setTimeout(function(){
+
+document.getElementById("welcomeScreen").style.display="none";
+document.getElementById("titleMain").style.display="block";
+document.getElementById("dashboard").style.display="grid";
+
+},2500);
+
+},600);
+
+}else{
+
+document.getElementById("loginError").innerText="ACCESS DENIED";
+
+}
+
+}
+
+/* TERMINAL SOUND */
+
+function beep(){
+let s=new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+s.play();
+}
+
+function type(lines,speed=900){
+
+stopProcess=false;
+
+let i=0;
+
+function run(){
+
+if(stopProcess) return;
+
+if(i<lines.length){
+
+document.getElementById("terminal").innerHTML+=lines[i]+"<br>";
+
+beep();
+
+i++;
+
+setTimeout(run,speed);
+
+}
+
+}
+
+run();
+
+}
+
+function randomIP(){
+return Math.floor(Math.random()*255)+"."+Math.floor(Math.random()*255)+"."+Math.floor(Math.random()*255)+"."+Math.floor(Math.random()*255);
+}
+
+function randomGPS(){
+return (Math.random()*180-90).toFixed(5)+", "+(Math.random()*360-180).toFixed(5);
+}
+
+function openPanel(title){
+
+document.getElementById("dashboard").style.display="none";
+document.getElementById("panel").style.display="block";
+
+document.getElementById("terminal").innerHTML="";
+document.getElementById("inputArea").innerHTML="";
+document.getElementById("error").innerHTML="";
+document.getElementById("title").innerText=title;
+
+}
+
+function back(){
+
+stopProcess=true;
+
+document.getElementById("panel").style.display="none";
+document.getElementById("phoneControlScreen").style.display="none";
+document.getElementById("cctvScreen").style.display="none";
+
+document.getElementById("terminal").innerHTML="";
+document.getElementById("inputArea").innerHTML="";
+
+document.getElementById("dashboard").style.display="grid";
+
+}
+
+/* LOCATION */
+
+function locationTool(){
+
+openPanel("SATELLITE LOCATION TRACKING");
+
+document.getElementById("inputArea").innerHTML=
+'<input id="target" placeholder="Phone number or device ID">'+
+'<br><button onclick="startLocation()">START</button>';
+
+}
+
+function startLocation(){
+
+let t=document.getElementById("target").value;
+
+if(t.trim()==""){
+document.getElementById("error").innerHTML="ACCESS DENIED ❌";
+return;
+}
+
+let lines=[
+
+"Connecting to satellite...",
+"Target: "+t,
+"IP Address: "+randomIP(),
+"GPS Coordinates: "+randomGPS(),
+"Tracking signal...",
+"Location locked ✔"
+
+];
+
+type(lines);
+
+}
+
+/* CCTV */
+
+function cctvTool(){
+
+openPanel("CCTV CAMERA ACCESS");
+
+document.getElementById("inputArea").innerHTML=
+'<input id="cam" placeholder="Camera ID"><br>'+
+'<input id="model" placeholder="Camera Model"><br>'+
+'<input id="mac" placeholder="MAC Address"><br>'+
+'<input id="sn" placeholder="Serial Number (S/N)"><br>'+
+'<button onclick="startCCTV()">CONNECT</button>';
+
+}
+
+function startCCTV(){
+
+let c=document.getElementById("cam").value;
+let model=document.getElementById("model").value;
+let mac=document.getElementById("mac").value;
+let sn=document.getElementById("sn").value;
+
+if(c.trim()==""||model.trim()==""||mac.trim()==""||sn.trim()==""){
+document.getElementById("error").innerHTML="ACCESS DENIED ❌";
+return;
+}
+
+let lines=[
+
+"Scanning CCTV network...",
+"Camera ID: "+c,
+"Camera Model: "+model,
+"MAC Address: "+mac,
+"Serial Number: "+sn,
+"Connecting...",
+"Bypassing password...",
+"Decrypting stream...",
+"Live camera feed accessed ✔"
+
+];
+
+type(lines);
+
+setTimeout(showCCTV,7000);
+
+}
+
+/* GRABBER TOOL */
+
+function grabTool(){
+
+openPanel("NETWORK GRABBER");
+
+document.getElementById("inputArea").innerHTML =
+'<input id="grabtarget" placeholder="Target URL or IP">'+
+'<br><button onclick="startGrab()">GRAB</button>';
+
+}
+
+function startGrab(){
+
+let t = document.getElementById("grabtarget").value;
+
+if(t.trim()==""){
+document.getElementById("error").innerHTML="ACCESS DENIED ❌";
+return;
+}
+
+let lines=[
+
+"Initializing packet sniffer...",
+"Target: "+t,
+"Scanning ports...",
+"Open ports found: 80, 443, 8080",
+"Capturing packets...",
+"Analyzing packets...",
+"Checking firewall...",
+"Firewall detected",
+"Attempting bypass...",
+"Access tunnel created ✔",
+"Extracting metadata...",
+"IP Address: "+randomIP(),
+"Location: "+randomGPS(),
+"Grab complete ✔"
+
+];
+
+type(lines);
+
+setTimeout(function(){ alert("CHECK THE SERVER ON TABAHI WEB"); },9000);
+
+}
+
+
+/* PHONE ACCESS TOOL */
+
+function phoneTool(){
+
+openPanel("PHONE REMOTE ACCESS");
+
+document.getElementById("inputArea").innerHTML =
+'<input id="pnum" placeholder="Phone Number"><br>'+
+'<input id="model" placeholder="Phone Model"><br>'+
+'<input id="ipv6" placeholder="IPv6 Address"><br>'+
+'<input id="mac" placeholder="WiFi MAC Address"><br>'+
+'<button onclick="startPhone()">CONNECT</button>';
+
+}
+
+function startPhone(){
+
+let num=document.getElementById("pnum").value;
+let model=document.getElementById("model").value;
+let ipv6=document.getElementById("ipv6").value;
+let mac=document.getElementById("mac").value;
+
+if(num.trim()==""||model.trim()==""||ipv6.trim()==""||mac.trim()==""){
+document.getElementById("error").innerHTML="ACCESS DENIED ❌";
+return;
+}
+
+let lines=[
+
+"Connecting to device...",
+"Phone Number: "+num,
+"Phone Model: "+model,
+"IPv6 Address: "+ipv6,
+"WiFi MAC Address: "+mac,
+"Bypassing lockscreen...",
+"Injecting remote shell...",
+"Accessing files...",
+"Accessing camera...",
+"Accessing microphone...",
+"Remote control granted ✔"
+
+];
+
+type(lines);
+
+setTimeout(showPhoneControl,9000);
+
+}
+
+/* DATA TRANSFER */
+
+function dataTool(){
+
+openPanel("DATA TRANSFER");
+
+document.getElementById("inputArea").innerHTML=
+'<input id="pnum" placeholder="Phone Number">'+
+'<br>'+
+'<input id="model" placeholder="Phone Model">'+
+'<br>'+
+'<input id="sim" placeholder="SIM Network">'+
+'<br><button onclick="startData()">TRANSFER</button>';
+
+}
+
+function startData(){
+
+let num=document.getElementById("pnum").value;
+let model=document.getElementById("model").value;
+let sim=document.getElementById("sim").value;
+
+if(num.trim()==""||model.trim()==""||sim.trim()==""){
+document.getElementById("error").innerHTML="ACCESS DENIED ❌";
+return;
+}
+
+let lines=[
+
+"Connecting device...",
+"Phone Number: "+num,
+"Phone Model: "+model,
+"SIM Network: "+sim,
+"Initializing secure transfer...",
+"Encrypting files..."
+
+];
+
+type(lines);
+
+setTimeout(function(){
+
+document.getElementById("terminal").innerHTML+=
+"<br>Uploading data...<br>"+
+"<div style='border:1px solid #00ff00;width:100%;height:20px'>"+
+"<div id='bar' style='background:#00ff00;width:0%;height:20px'></div>"+
+"</div>"+
+"<p id='percent'>0%</p>";
+
+let width=0;
+
+let load=setInterval(function(){
+
+if(width>=100){
+
+clearInterval(load);
+
+document.getElementById("terminal").innerHTML +=
+"<br>Transfer Complete ✔"+
+"<br>DATA TRANSFERED TO AYUSH DATAPACK STORAGE ✔";
+
+}else{
+
+width++;
+
+document.getElementById("bar").style.width=width+"%";
+document.getElementById("percent").innerText=width+"%";
+
+}
+
+},40);
+
+},5000);
+
+}
+
+/* MATRIX DESTRUCTION */
+
+function matrixDestroyTool(){
+
+openPanel("MATRIX DESTRUCTION");
+
+document.getElementById("inputArea").innerHTML=
+
+'<input id="cnum" placeholder="Contact Number"><br>'+
+'<input id="addr" placeholder="Address"><br>'+
+'<input id="ip" placeholder="IP Address"><br>'+
+'<input id="port" placeholder="Port"><br>'+
+'<input id="model2" placeholder="Device Model"><br>'+
+'<input id="netip" placeholder="Network IP"><br>'+
+'<input id="os" placeholder="Operating System"><br>'+
+'<button onclick="startDestruction()">INITIATE</button>';
+
+}
+
+function startDestruction(){
+
+let c=document.getElementById("cnum").value;
+let a=document.getElementById("addr").value;
+let ip=document.getElementById("ip").value;
+let port=document.getElementById("port").value;
+let model=document.getElementById("model2").value;
+let net=document.getElementById("netip").value;
+let os=document.getElementById("os").value;
+
+if(c.trim()==""||a.trim()==""||ip.trim()==""||port.trim()==""||model.trim()==""||net.trim()==""||os.trim()==""){
+document.getElementById("error").innerHTML="ACCESS DENIED ❌";
+return;
+}
+
+document.getElementById("terminal").innerHTML="";
+
+let lines=[
+
+"Connecting destruction protocol...",
+"Contact: "+c,
+"Address: "+a,
+"IP: "+ip,
+"Port: "+port,
+"Model: "+model,
+"Network IP: "+net,
+"OS: "+os,
+"Initializing MATRIX CORE..."
+
+];
+
+type(lines);
+
+setTimeout(startCountdown,5000);
+
+}
+
+/* COUNTDOWN */
+
+function startCountdown(){
+
+let time=20;
+
+document.getElementById("terminal").innerHTML+="<br>DESTRUCTION COUNTDOWN STARTED<br>";
+document.getElementById("terminal").innerHTML+="<h2 id='count'>20</h2>";
+
+let timer=setInterval(function(){
+
+time--;
+
+document.getElementById("count").innerText=time;
+
+if(time<=0){
+
+clearInterval(timer);
+
+startDestructionProcess();
+
+}
+
+},1000);
+
+}
+
+/* DESTRUCTION PROCESS */
+
+function startDestructionProcess(){
+
+document.getElementById("terminal").innerHTML+=
+"<br>DESTRUCTION INITIATED 💀<br>"+
+"<div style='border:1px solid #00ff00;width:100%;height:20px'>"+
+"<div id='dbar' style='background:#00ff00;width:0%;height:20px'></div>"+
+"</div>"+
+"<p id='dpercent'>0%</p>";
+
+let width=0;
+
+let load=setInterval(function(){
+
+if(width>=100){
+
+clearInterval(load);
+
+document.getElementById("terminal").innerHTML +=
+"<br>MATRIX SYSTEM DESTROYED ✔";
+
+}else{
+
+width++;
+
+document.getElementById("dbar").style.width=width+"%";
+document.getElementById("dpercent").innerText=width+"%";
+
+}
+
+},50);
+
+}
+
+/* MATRIX PARTICLES */
+
+let canvas = document.getElementById("matrix");
+let ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%^&*";
+letters = letters.split("");
+
+let fontSize = 16;
+let columns = canvas.width / fontSize;
+
+let drops = [];
+
+for (let i = 0; i < columns; i++) {
+    drops[i] = 1;
+}
+
+function draw(){
+
+ctx.fillStyle = "rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle = "#00ff00";
+ctx.font = fontSize + "px monospace";
+
+for(let i=0;i<drops.length;i++){
+
+let text = letters[Math.floor(Math.random()*letters.length)];
+
+ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+
+if(drops[i]*fontSize > canvas.height && Math.random()>0.975){
+drops[i]=0;
+}
+
+drops[i]++;
+
+}
+
+}
+
+window.addEventListener("resize",function(){
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+});
+
+window.addEventListener("resize",function(){
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+});
+
+/* PHONE CONTROL FUNCTION */
+
+function showPhoneControl(){
+
+document.getElementById("panel").style.display="none";
+
+let screen=document.getElementById("phoneControlScreen");
+screen.style.display="flex";
+
+document.getElementById("controlText").innerText="CONNECTING TO THE SERVER...";
+document.getElementById("controlSub").innerText="Loading...";
+
+setTimeout(function(){
+
+document.getElementById("controlText").innerText="PHONE UNDER THE CONTROL AFTER 20MINUTE";
+document.getElementById("controlSub").innerText="CHECK THE SERVER IN TABAHI WEB";
+
+},3000);
+
+}
+
+function showCCTV(){
+
+document.getElementById("panel").style.display="none";
+
+let screen=document.getElementById("cctvScreen");
+screen.style.display="flex";
+
+setTimeout(function(){
+
+document.getElementById("cctvText").innerText="CAMERA CONNECTED ✔";
+document.getElementById("cctvSub").innerText="LIVE FEED ACTIVE";
+
+document.getElementById("cameraFeed").style.display="block";
+
+},3000);
+
+}
+
+function showServerPopup(){
+
+alert("GRAB COMPLETED CHECK THE SERVER ON TABAHI WEB");
+
+}
+
+setInterval(draw,33);
+
+</script>
+
+<!-- PHONE CONTROL SCREEN -->
+
+<div id="phoneControlScreen" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100vh;
+background:black;
+color:#00ff00;
+font-family:monospace;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:999;
+">
+
+<h1 id="controlText">CONNECTING...</h1>
+<p id="controlSub"></p>
+
+<button onclick="back()">BACK TO DASHBOARD</button>
+
+</div>
+
+<!-- CCTV LIVE SCREEN -->
+
+<div id="cctvScreen" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100vh;
+background:black;
+color:#00ff00;
+font-family:monospace;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:999;
+">
+
+<h1 id="cctvText">CONNECTING TO CAMERA...</h1>
+<p id="cctvSub">Loading...</p>
+
+<div id="cameraFeed" style="display:none;margin-top:20px;">
+<h2>LIVE CAMERA FEED</h2>
+<video width="500" autoplay loop muted controls>
+<source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+</video>
+</div>
+
+<button onclick="back()">BACK TO DASHBOARD</button>
+
+</div>
+
+</body>
+</html>
