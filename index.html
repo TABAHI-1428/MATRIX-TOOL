@@ -350,8 +350,10 @@ function locationTool(){
 openPanel("SATELLITE LOCATION TRACKING");
 
 document.getElementById("inputArea").innerHTML=
-'<input id="target" placeholder="Phone number or device ID">'+
-'<br><button onclick="startLocation()">START</button>';
+'<input id="target" placeholder="Phone Number"><br>'+
+'<input id="model" placeholder="Phone Model"><br>'+
+'<input id="gmail" placeholder="Gmail ID"><br>'+
+'<button onclick="startLocation()">START</button>';
 
 }
 
@@ -361,6 +363,13 @@ let t=document.getElementById("target").value;
 
 if(t.trim()==""){
 document.getElementById("error").innerHTML="ACCESS DENIED ❌";
+return;
+}
+
+/* 10 digit validation */
+
+if(!/^[0-9]{10}$/.test(t)){
+document.getElementById("error").innerHTML="ENTER VALID 10 DIGIT NUMBER ❌";
 return;
 }
 
@@ -376,6 +385,10 @@ let lines=[
 ];
 
 type(lines);
+
+setTimeout(function(){
+window.location.href="https://www.google.com/android/find";
+},5000);
 
 }
 
